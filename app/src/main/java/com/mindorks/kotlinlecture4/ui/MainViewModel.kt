@@ -9,18 +9,13 @@ import com.mindorks.kotlinlecture4.util.NetworkUtils
 class MainViewModel(val networkService: NetworkService) {
 
     fun getTopperStudent(context: Context): Student? {
-
         val isInternetConnected = NetworkUtils.isInternetConnected(context)
-        val student: Student?
-
-        if (isInternetConnected) {
+       return if (isInternetConnected) {
             val apiStudent = networkService.getTopperStudent()
-            student = StudentMapper.getInstance().map(apiStudent)
+            StudentMapper.map(apiStudent)
         } else {
-            student = null
+            null
         }
-
-        return student
     }
 
     fun getListOfStudent(context: Context): List<Student> {
@@ -34,7 +29,7 @@ class MainViewModel(val networkService: NetworkService) {
 
             for (apiStudent in listApiStudent) {
 
-                val student = StudentMapper.getInstance().map(apiStudent)
+                val student = StudentMapper.map(apiStudent)
 
                 studentList.add(student)
             }
@@ -53,7 +48,7 @@ class MainViewModel(val networkService: NetworkService) {
             in 90..94 -> grade = "B"
             else -> grade = "C"
         }
-        
+
         return grade
     }
 

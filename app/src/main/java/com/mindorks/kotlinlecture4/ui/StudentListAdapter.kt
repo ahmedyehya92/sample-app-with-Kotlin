@@ -10,14 +10,14 @@ import com.mindorks.kotlinlecture4.model.Student
 import com.mindorks.kotlinlecture4.ui.StudentListAdapter.StudentViewHolder
 
 class StudentListAdapter(
-    private val onRecyclerViewItemClickListener: OnRecyclerViewItemClickListener
+    private val clickListener: (Student) -> Unit
 ) : Adapter<StudentViewHolder>() {
 
     private var studentList: List<Student>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = StudentViewHolder(
         LayoutInflater.from(parent.context).inflate(R.layout.item_student_view, parent, false),
-        onRecyclerViewItemClickListener
+        clickListener
     )
 
     override fun getItemCount() = studentList?.size ?: 0
@@ -35,7 +35,7 @@ class StudentListAdapter(
         notifyDataSetChanged()
     }
 
-    class StudentViewHolder(itemView: View, val onRecyclerViewItemClickListener: OnRecyclerViewItemClickListener) :
+    class StudentViewHolder(itemView: View, private val clickListener: (Student) -> Unit) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
         fun bind(student: Student) {
@@ -46,7 +46,7 @@ class StudentListAdapter(
 
             textView.setOnClickListener(object : View.OnClickListener {
                 override fun onClick(v: View?) {
-                    onRecyclerViewItemClickListener.onItemClick(student)
+                    clickListener(student)
                 }
 
             })

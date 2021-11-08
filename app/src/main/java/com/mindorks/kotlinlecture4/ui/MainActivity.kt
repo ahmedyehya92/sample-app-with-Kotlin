@@ -1,7 +1,6 @@
 package com.mindorks.kotlinlecture4.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -11,7 +10,7 @@ import com.mindorks.kotlinlecture4.R
 import com.mindorks.kotlinlecture4.model.Student
 import com.mindorks.kotlinlecture4.services.NetworkService
 
-class MainActivity : AppCompatActivity(), OnRecyclerViewItemClickListener {
+class MainActivity : AppCompatActivity() {
 
 
     private lateinit var studentRecyclerView: androidx.recyclerview.widget.RecyclerView
@@ -27,15 +26,15 @@ class MainActivity : AppCompatActivity(), OnRecyclerViewItemClickListener {
 
     private var topperStudent: Student? = null
 
+    val clickListener: (Student) -> Unit = { student ->
+        Toast.makeText(this, student.userName, Toast.LENGTH_SHORT).show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         init()
         setupRecyclerView()
-    }
-
-    override fun onItemClick(student: Student) {
-        Toast.makeText(this, student.userName, Toast.LENGTH_SHORT).show()
     }
 
     private fun init() {
@@ -45,47 +44,40 @@ class MainActivity : AppCompatActivity(), OnRecyclerViewItemClickListener {
         topperStudentName = findViewById(R.id.topperStudentName)
 
         getTopperStudentButton = findViewById(R.id.buttonGetTopper)
-        getTopperStudentButton.setOnClickListener(object : View.OnClickListener {
 
-            override fun onClick(v: View?) {
-                topperStudent = mainViewModel.getTopperStudent(this@MainActivity)
-                topperStudentName.text = topperStudent?.userName ?: "Unknown"
 
-            }
 
-        })
+
+        getTopperStudentButton.setOnClickListener { view ->
+            topperStudent = mainViewModel.getTopperStudent(this@MainActivity)
+            topperStudentName.text = topperStudent?.userName ?: "Unknown"
+        }
 
         getStudentList = findViewById(R.id.buttonGetStudentList)
-        getStudentList.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(v: View?) {
-                val studentList = mainViewModel.getListOfStudent(this@MainActivity)
-                studentListAdapter.updateList(studentList)
-            }
-
-        })
+        getStudentList.setOnClickListener { view ->
+            val listStudent = mainViewModel.getListOfStudent(this@MainActivity)
+            studentListAdapter.updateList(listStudent)
+        }
+        getStudentList.setOnClickListener { view ->
+            val studentList = mainViewModel.getListOfStudent(this@MainActivity)
+            studentListAdapter.updateList(studentList)
+        }
 
         showStudentGrade = findViewById(R.id.buttonShowGrade)
-        showStudentGrade.setOnClickListener(object : View.OnClickListener {
-
-            override fun onClick(v: View?) {
-
-                topperStudent?.let {
-                    val studentGrade = mainViewModel.getStudentGrade(it.averageMark)
-                    Toast.makeText(this@MainActivity, studentGrade, Toast.LENGTH_SHORT).show()
-                }
-
+        showStudentGrade.setOnClickListener {
+            topperStudent?.let {
+                val studentGrade = mainViewModel.getStudentGrade(it.averageMark)
+                Toast.makeText(this@MainActivity, studentGrade, Toast.LENGTH_SHORT).show()
             }
 
-        })
-
+        }
     }
 
     private fun setupRecyclerView() {
 
         studentRecyclerView = findViewById(R.id.studentList)
 
-        studentListAdapter = StudentListAdapter(this)
+        studentListAdapter = StudentListAdapter(clickListener)
 
         studentRecyclerView.adapter = studentListAdapter
 
@@ -93,8 +85,4 @@ class MainActivity : AppCompatActivity(), OnRecyclerViewItemClickListener {
 
     }
 
-}
-
-interface OnRecyclerViewItemClickListener {
-    fun onItemClick(student: Student)
 }
